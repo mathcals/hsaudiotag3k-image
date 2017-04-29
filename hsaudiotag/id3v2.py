@@ -125,18 +125,8 @@ class FrameDataApic(object):
         if stringtype in STRING_ENCODINGS:
             self.mime_type = _read_id3_string(readcstr(fp), stringtype, '\0')
         picturetype = fp.read(1)[0]
-        print(picturetype)
         if stringtype in STRING_ENCODINGS:
             self.description = _read_id3_string(readcstr(fp), stringtype, '\0')
-        #self.size = _read_id3_size(fp.read(3))
-        #fp.read(1)
-        print(self.mime_type)
-        #from PIL.JpegImagePlugin import JpegImageFile
-        #Image.register_open("JPG", JpegImageFile)
-        #Image.register_save("PNG")
-
-        #Image.register_extension("JPG", ".jpg")
-        #Image.register_mime("JPG", "image/jpg")
         image_stream = io.BytesIO()
         image_stream.write(fp.read())
         image_stream.seek(0)
