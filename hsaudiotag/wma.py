@@ -103,6 +103,7 @@ class WMADecoder(object):
         fp.seek(0, 2)
         self.size = fp.tell()
         fp.seek(0, 0)
+        self.image=None
         self.audio_offset = 0
         self.audio_size = 0
         self.duration = 0

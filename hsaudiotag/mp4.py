@@ -327,4 +327,8 @@ class File(AtomBox):
     @property
     def year(self):
         return self._get_attr('moov.udta.meta.ilst.©day')[:4]
+
+    @property
+    def image(self):
+        return None
     

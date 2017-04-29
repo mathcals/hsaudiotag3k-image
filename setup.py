@@ -1,5 +1,5 @@
 from setuptools import setup
-LONG_DESC = open('README', 'rt').read() + '\n\n' + open('CHANGES', 'rt').read()
+LONG_DESC = open('README', 'rt').read()
 
 setup(
     name='hsaudiotag3k-image',

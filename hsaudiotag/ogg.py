@@ -136,7 +136,7 @@ class Vorbis:
         self.year = comment.year
         self.genre = comment.genre
         self.comment = comment.comment
-        
+        self.image = None
         #Get third page for audio_offset
         page = next(page)
         if not page.valid:

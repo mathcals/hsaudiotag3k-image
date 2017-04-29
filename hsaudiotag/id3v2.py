@@ -352,5 +352,9 @@ class Id3v2(object):
     @property    
     def image(self):
         frame_id = cond(self.version >= 3, 'APIC', 'PIC')
-        im = self._get_frame_data(frame_id).image
-        return im
+        try:
+            im = self._get_frame_data(frame_id).image
+            return im
+        except:
+            return None
+        

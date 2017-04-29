@@ -92,6 +92,7 @@ class FLAC(object):
         self.duration = 0
         self.audio_offset = 0
         self.audio_size = 0
+        self.image = None
     
     def _read(self, fp):
         id = fp.read(len(self.ID))
@@ -114,7 +115,7 @@ class FLAC(object):
         self.year = comment.year
         self.genre = comment.genre
         self.comment = comment.comment
-        
+        self.image = None
         last = self.get_last_block()
         self.audio_offset = last.offset + last.HEADER_SIZE + last.size
         self.audio_size = self.size - self.audio_offset
