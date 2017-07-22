@@ -8,9 +8,10 @@
 
 import re
 import struct
-
+from PIL import Image
 from .util import open_if_filename, tryint
 from .genres import genre_by_index
+import io
 
 HEADER_SIZE = 8
 
@@ -137,6 +138,7 @@ class AtomBox(Atom):
 
 #Specific atoms *************************************************************
 
+
 class AttributeAtom(AtomBox):
     def _get_atom_class(self, type):
         return AttributeDataAtom
@@ -148,7 +150,10 @@ class AttributeAtom(AtomBox):
         except IndexError:
             # For some reason, our attribute atom has no data sub-atom, no biggie, just return nothing.
             return ''
-    
+
+class ImageAttributeAtom(AttributeAtom):
+    def _get_atom_class(self, type):
+        return ImageAttributeDataAtom
 
 class AttributeDataAtom(Atom):
     def _get_data_model(self, integer_type='i'):
@@ -168,6 +173,19 @@ class AttributeDataAtom(Atom):
     def attr_data(self):
         return self.data[2]
     
+class ImageAttributeDataAtom(AttributeDataAtom):
+    #def _get_data_model(self, integer_type='i'):
+    #    [data_type] = struct.unpack('!i', self.read(0, 4))
+    #    return '2i' + (integer_type if data_type == 0 else '*s')
+    
+    def _read_atom_data(self):
+        result = Atom._read_atom_data(self)
+        #Convert to unicode if needed
+        if isinstance(result[2], bytes):
+            result = list(result)
+            result[2] = Image.open(io.BytesIO(result[2]))
+            result = tuple(result)
+        return result
 
 class EsdsAtom(Atom):
     cls_data_model = '26si' 
@@ -224,6 +242,7 @@ ATOM_SPECS = {
     '©day': AttributeAtom,
     '©cmt': AttributeAtom,
     '©gen': AttributeAtom,
+    'covr': ImageAttributeAtom,
     'data': AttributeDataAtom,
     'esds': EsdsAtom,
     'gnre': GnreAtom,
