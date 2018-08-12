@@ -25,7 +25,13 @@ EXT2CLASS = {
 }
 
 AUDIO_ATTRS = {'size', 'duration', 'bitrate', 'sample_rate', 'audio_offset', 'audio_size'}
-TAG_ATTRS = {'artist', 'album', 'title', 'genre', 'year', 'track', 'comment', 'image'}
+TAG_ATTRS = {'artist', 'album', 'title', 'genre', 'year', 'track', 'comment', 'image', 'musicbrainz_release_id',
+'musicbrainz_artist_id',
+'musicbrainz_recording_id',
+'musicbrainz_album_artist_id',
+'musicbrainz_release_group_id',
+'musicbrainz_track_id',
+'musicbrainz_work_id'}
 
 class File:
     """Automatically determine a file type and decode it accordingly, providing a unified interface
@@ -63,7 +69,10 @@ class File:
         tag = f.tag if hasattr(f, 'tag') else f
         if tag is not None:
             for attrname in TAG_ATTRS:
-                setattr(self, attrname, getattr(tag, attrname))
+                if hasattr(tag, attrname):
+                    setattr(self, attrname, getattr(tag, attrname))
+                else:
+                    setattr(self, attrname, None)
     
     def _set_invalid_attrs(self):
         self.valid = False

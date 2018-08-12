@@ -119,6 +119,20 @@ class FrameDataText(object):
     def supports(frameid):
         return frameid.startswith('T')
 
+class FrameDataTXXX(object):
+    def __init__(self, fp):
+        self.text = ''
+        self.description = ''
+        stringtype = fp.read(1)[0]
+        if stringtype in STRING_ENCODINGS:
+            parts = _read_id3_string(fp.read(), stringtype, nullreplace='\0').split('\0')
+            self.description = parts[0]
+            self.text = parts[1]
+
+    @staticmethod
+    def supports(frameid):
+        return frameid == 'TXXX'
+
 class FrameDataApic(object):
     def __init__(self, fp : io.BytesIO):
         stringtype = fp.read(1)[0]
@@ -165,7 +179,7 @@ class FrameDataComment(object):
         return self.comment if self.comment else self.title
     
 
-FRAMEDATA_LIST = [FrameDataText, FrameDataComment, FrameDataApic,]
+FRAMEDATA_LIST = [FrameDataTXXX, FrameDataText, FrameDataComment, FrameDataApic,]
 
 def _find_frame_data_class(frameid):
     for framedataclass in FRAMEDATA_LIST:
@@ -196,6 +210,12 @@ class Id3Frame(object):
             else:
                 raise NotImplementedError('Support for frame \'%s\' is not implemented yet' % self.frame_id)
         return self._data
+
+    def get_full_id(self):
+        if self.frame_id != 'TXXX':
+            return self.frame_id
+        else:
+            return self.frame_id + ":" + self.data.description
     
 
 class Id3v22Frame(Id3Frame):
@@ -264,7 +284,7 @@ class Id3v2(object):
             if (self._last_read_frame is not None) and (self._last_read_frame.size > 0x7f):
                 self._had_large_frame = True
             self._last_read_frame = frame
-            self.frames[frame.frame_id] = frame
+            self.frames[frame.get_full_id()] = frame
             frame = self._get_frame(fp)
         if (self._last_read_frame is not None) and (self._last_read_frame.size > 0x7f) and \
             (not self._had_large_frame) and (self.version == 4):
@@ -347,4 +367,48 @@ class Id3v2(object):
             return im
         except:
             return None
+
+    def user_defined(self, name):
+        frame_id = 'TXXX:' + name
+        try:
+            im = self._get_frame_text_line(frame_id)
+            return im
+        except:
+            return None
+
+    def musicbrainz(self, id_type):
+        id = self.user_defined(id_type)
+        if id is None:
+            return None
+        if len(id) != 36:
+            return None
+        return id
+
+    @property    
+    def musicbrainz_track_id(self):
+        return self.musicbrainz("MusicBrainz Release Track Id")
+
+    @property    
+    def musicbrainz_release_id(self):
+        return self.musicbrainz("MusicBrainz Album Id")
+
+    @property
+    def musicbrainz_artist_id(self):
+        return self.musicbrainz("MusicBrainz Artist Id")
+
+    @property
+    def musicbrainz_album_artist_id(self):
+        return self.musicbrainz("MusicBrainz Album Artist Id")
+
+    @property
+    def musicbrainz_work_id(self):
+        return self.musicbrainz("MusicBrainz Work Id")
+
+    @property
+    def musicbrainz_recording_id(self):
+        return self.musicbrainz("MusicBrainz Recording Id")
+
+    @property
+    def musicbrainz_release_group_id(self):
+        return self.musicbrainz("MusicBrainz Release Group Id")
         
