@@ -31,7 +31,8 @@ TAG_ATTRS = {'artist', 'album', 'title', 'genre', 'year', 'track', 'comment', 'i
 'musicbrainz_album_artist_id',
 'musicbrainz_release_group_id',
 'musicbrainz_track_id',
-'musicbrainz_work_id'}
+'musicbrainz_work_id',
+'part_of_set'}
 
 class File:
     """Automatically determine a file type and decode it accordingly, providing a unified interface
@@ -80,6 +81,6 @@ class File:
         for attrname in AUDIO_ATTRS:
             setattr(self, attrname, 0)
         for attrname in TAG_ATTRS:
-            default = '' if attrname != 'track' else 0
+            default = '' if attrname != 'track' and attrname != 'part_of_set' else 0
             setattr(self, attrname, default)
     

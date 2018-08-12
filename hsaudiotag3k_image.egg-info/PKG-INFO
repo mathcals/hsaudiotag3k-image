@@ -1,11 +1,12 @@
 Metadata-Version: 1.0
 Name: hsaudiotag3k-image
-Version: 1.1.3
+Version: 1.1.5
 Summary: Modfied version of hsaudiotag (added support for images). Read metdata (tags) of mp3, mp4, wma, ogg, flac and aiff files.
 Home-page: UNKNOWN
 Author: UNKNOWN
 Author-email: UNKNOWN
 License: BSD License
+Description-Content-Type: UNKNOWN
 Description: =======================================
         hsaudiotag3k-image - Read audio file metadata
         =======================================

@@ -3,7 +3,7 @@ LONG_DESC = open('README', 'rt').read()
 
 setup(
     name='hsaudiotag3k-image',
-    version='1.1.4',
+    version='1.1.5',
     packages=['hsaudiotag'],
     scripts=[],
     install_requires=[],

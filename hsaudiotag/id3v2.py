@@ -356,9 +356,17 @@ class Id3v2(object):
         return self._decode_track(s)
     
     @property
+    def part_of_set(self):
+        frame_id = 'TPOS'
+        s = self._get_frame_text_line(frame_id)
+        return self._decode_track(s)
+
+    @property
     def year(self):
         frame_id = cond(self.version >= 3, 'TYER', 'TYE')
         return self._get_frame_text_line(frame_id)
+
+
     @property    
     def image(self):
         frame_id = cond(self.version >= 3, 'APIC', 'PIC')
@@ -367,6 +375,7 @@ class Id3v2(object):
             return im
         except:
             return None
+
 
     def user_defined(self, name):
         frame_id = 'TXXX:' + name
