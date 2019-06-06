@@ -1,16 +1,17 @@
 # Created By: Virgil Dupras
 # Created On: 2010-12-28
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
-# 
-# This software is licensed under the "BSD" License as described in the "LICENSE" file, 
-# which should be included with this package. The terms are also available at 
+#
+# This software is licensed under the "BSD" License as described in the "LICENSE" file,
+# which should be included with this package. The terms are also available at
 # http://www.hardcoded.net/licenses/bsd_license
 
 import os.path as op
 
 from . import mpeg, mp4, wma, ogg, flac, aiff
 
-ALL_CLASSES = [mp4.File, mpeg.Mpeg, wma.WMADecoder, ogg.Vorbis, flac.FLAC, aiff.File]
+ALL_CLASSES = [mp4.File, mpeg.Mpeg, wma.WMADecoder,
+               ogg.Vorbis, flac.FLAC, aiff.File]
 
 EXT2CLASS = {
     'mp3': mpeg.Mpeg,
@@ -24,20 +25,23 @@ EXT2CLASS = {
     'aifc': aiff.File,
 }
 
-AUDIO_ATTRS = {'size', 'duration', 'bitrate', 'sample_rate', 'audio_offset', 'audio_size'}
+AUDIO_ATTRS = {'size', 'duration', 'bitrate',
+               'sample_rate', 'audio_offset', 'audio_size'}
 TAG_ATTRS = {'artist', 'album', 'title', 'genre', 'year', 'track', 'comment', 'image', 'musicbrainz_release_id',
-'musicbrainz_artist_id',
-'musicbrainz_recording_id',
-'musicbrainz_album_artist_id',
-'musicbrainz_release_group_id',
-'musicbrainz_track_id',
-'musicbrainz_work_id',
-'part_of_set'}
+             'musicbrainz_artist_id',
+             'musicbrainz_recording_id',
+             'musicbrainz_album_artist_id',
+             'musicbrainz_release_group_id',
+             'musicbrainz_track_id',
+             'musicbrainz_work_id',
+             'part_of_set'}
+
 
 class File:
     """Automatically determine a file type and decode it accordingly, providing a unified interface
     to all file types.
     """
+
     def __init__(self, infile):
         self._set_invalid_attrs()
         f = self._guess_class(infile)
@@ -45,7 +49,7 @@ class File:
             self._set_attrs(f)
         if hasattr(f, 'close'):
             f.close()
-    
+
     @staticmethod
     def _guess_class(infile):
         if isinstance(infile, str):
@@ -61,7 +65,7 @@ class File:
                 return f
         else:
             return None
-    
+
     def _set_attrs(self, f):
         self.valid = True
         self.original = f
@@ -74,7 +78,7 @@ class File:
                     setattr(self, attrname, getattr(tag, attrname))
                 else:
                     setattr(self, attrname, None)
-    
+
     def _set_invalid_attrs(self):
         self.valid = False
         self.original = None
@@ -83,4 +87,3 @@ class File:
         for attrname in TAG_ATTRS:
             default = '' if attrname != 'track' and attrname != 'part_of_set' else 0
             setattr(self, attrname, default)
-    
