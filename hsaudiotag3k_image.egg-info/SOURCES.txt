@@ -1,5 +1,7 @@
+.gitignore
 README
 setup.py
+hsaudiotag/.gitignore
 hsaudiotag/__init__.py
 hsaudiotag/aiff.py
 hsaudiotag/auto.py
