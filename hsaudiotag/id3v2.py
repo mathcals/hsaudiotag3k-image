@@ -145,6 +145,24 @@ class FrameDataTXXX(object):
         return frameid == 'TXXX'
 
 
+class FrameDataUFID(object):
+    def __init__(self, fp):
+        self.owner = ''
+        self.identifier = ''
+        parts = _read_id3_string(
+            fp.read(), 3, nullreplace='\0').split('\0')
+        self.owner = parts[0]
+        self.identifier = parts[1]
+
+    @staticmethod
+    def supports(frameid):
+        return frameid == 'UFID'
+
+    @property
+    def text(self):
+        return self.identifier
+
+
 class FrameDataApic(object):
     def __init__(self, fp: io.BytesIO):
         stringtype = fp.read(1)[0]
@@ -192,7 +210,7 @@ class FrameDataComment(object):
 
 
 FRAMEDATA_LIST = [FrameDataTXXX, FrameDataText,
-                  FrameDataComment, FrameDataApic, ]
+                  FrameDataComment, FrameDataApic, FrameDataUFID]
 
 
 def _find_frame_data_class(frameid):
@@ -228,10 +246,12 @@ class Id3Frame(object):
         return self._data
 
     def get_full_id(self):
-        if self.frame_id != 'TXXX':
-            return self.frame_id
-        else:
+        if self.frame_id == 'TXXX':
             return self.frame_id + ":" + self.data.description
+        elif self.frame_id == 'UFID':
+            return self.frame_id + ":" + self.data.owner
+        else:
+            return self.frame_id
 
 
 class Id3v22Frame(Id3Frame):
@@ -401,8 +421,15 @@ class Id3v2(object):
         except:
             return None
 
-    def musicbrainz(self, id_type):
-        id = self.user_defined(id_type)
+    def ufid(self, name):
+        frame_id = 'UFID:' + name
+        try:
+            im = self._get_frame_text_line(frame_id)
+            return im
+        except:
+            return None
+
+    def musicbrainz(self, id):
         if id is None:
             return None
         if len(id) != 36:
@@ -411,27 +438,28 @@ class Id3v2(object):
 
     @property
     def musicbrainz_track_id(self):
-        return self.musicbrainz("MusicBrainz Release Track Id")
+        return self.musicbrainz(self.user_defined("MusicBrainz Release Track Id"))
 
     @property
     def musicbrainz_release_id(self):
-        return self.musicbrainz("MusicBrainz Album Id")
+        return self.musicbrainz(self.user_defined("MusicBrainz Album Id"))
 
     @property
     def musicbrainz_artist_id(self):
-        return self.musicbrainz("MusicBrainz Artist Id")
+        return self.musicbrainz(self.user_defined("MusicBrainz Artist Id"))
 
     @property
     def musicbrainz_album_artist_id(self):
-        return self.musicbrainz("MusicBrainz Album Artist Id")
+        return self.musicbrainz(self.user_defined("MusicBrainz Album Artist Id"))
 
     @property
     def musicbrainz_work_id(self):
-        return self.musicbrainz("MusicBrainz Work Id")
+        return self.musicbrainz(self.user_defined("MusicBrainz Work Id"))
 
     @property
     def musicbrainz_recording_id(self):
-        return self.musicbrainz("MusicBrainz Recording Id")
+        return self.musicbrainz(self.ufid('http://musicbrainz.org'))
+        # return self.musicbrainz("MusicBrainz Recording Id")
 
     @property
     def musicbrainz_release_group_id(self):
